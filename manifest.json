@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+
+  "name": "Chessbomb-PGN-Grabber",
+  "description": "Downloads Chessbomb PGNs",
+  "version": "1.0",
+
+  "permissions": [
+    "tabs",
+    "background",
+    "downloads",
+    "*://*.chessbomb.com/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.chessbomb.com/*"],
+      "js": ["pgngrabber.js"]
+    }
+  ],
+
+  "background":{
+    "page": "background.html"
+  }
+}
