@@ -29,8 +29,10 @@ function pgn(){
     var moves = ["dummy"];
 
     for(var moveNode of gameMoves.children){
-        var moveText = moveNode.querySelector("span[class*='cbRootMove']").textContent;
-        moves.push(moveText);
+        let moveSpan = moveNode.querySelector("span[class*='cbRootMove']");
+        if(moveSpan){
+            moves.push(moveSpan.textContent);
+        }
     }
 
     var gameInfo = document.querySelector("div[data-bind*='tmpl-game-info']");
