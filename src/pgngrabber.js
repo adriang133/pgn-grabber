@@ -37,7 +37,7 @@ ${game.moveText}
 function gameInfo(){
     let gameRoot = document.querySelector("div[data-bind*='tmpl-move-viewer-moves']");
     let gameMoves = gameRoot.querySelector("span[data-bind*='tmpl-mv-variation']");
-    let result = gameRoot.querySelector("span[class*='cbMoveResult']").textContent;
+    let result = gameRoot.querySelector("span[class*='cbMoveResult']").textContent.replace(/\u00BD/g, "1/2");
 
     let moves = ["dummy"];
 
