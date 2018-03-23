@@ -1,9 +1,9 @@
 chrome.extension.sendMessage({}, function(response) {
-    var readyStateCheckInterval = setInterval(function() {
+    let readyStateCheckInterval = setInterval(function() {
     if (document.readyState === "complete") {
         clearInterval(readyStateCheckInterval);
 
-        var button = document.querySelector("a[data-bind*='urlPGN']");
+        let button = document.querySelector("a[data-bind*='urlPGN']");
         if(button){
             button.setAttribute("href", "#");
             button.style.backgroundColor = "green";
@@ -18,42 +18,52 @@ chrome.extension.sendMessage({}, function(response) {
 });
 
 function downloadPgn(){
-    chrome.runtime.sendMessage(pgn());
+    let game = gameInfo();
+    let pgn = `
+${pgnTag("Event", game.event)}
+${pgnTag("Round", game.round)}
+${pgnTag("White", game.white)}
+${pgnTag("Black", game.black)}
+${pgnTag("Result", game.result)}
+
+${game.moveText}
+`;
+    chrome.runtime.sendMessage({
+        fileName: `${game.white}-${game.black} (${game.event}-${game.round}).pgn`,
+        textContent: pgn
+    });
 }
 
-function pgn(){
-    var gameRoot = document.querySelector("div[data-bind*='tmpl-move-viewer-moves']");
-    var gameMoves = gameRoot.querySelector("span[data-bind*='tmpl-mv-variation']");
-    var result = gameRoot.querySelector("span[class*='cbMoveResult']").textContent;
+function gameInfo(){
+    let gameRoot = document.querySelector("div[data-bind*='tmpl-move-viewer-moves']");
+    let gameMoves = gameRoot.querySelector("span[data-bind*='tmpl-mv-variation']");
+    let result = gameRoot.querySelector("span[class*='cbMoveResult']").textContent;
 
-    var moves = ["dummy"];
+    let moves = ["dummy"];
 
-    for(var moveNode of gameMoves.children){
+    for(let moveNode of gameMoves.children){
         let moveSpan = moveNode.querySelector("span[class*='cbRootMove']");
         if(moveSpan){
             moves.push(moveSpan.textContent);
         }
     }
 
-    var gameInfo = document.querySelector("div[data-bind*='tmpl-game-info']");
+    let gameInfo = document.querySelector("div[data-bind*='tmpl-game-info']");
 
-    var whitePlayer = gameInfo.querySelector("a[data-bind*='white()']").textContent;
-    var blackPlayer = gameInfo.querySelector("a[data-bind*='black()']").textContent;
+    let whitePlayer = gameInfo.querySelector("a[data-bind*='white()']").textContent;
+    let blackPlayer = gameInfo.querySelector("a[data-bind*='black()']").textContent;
 
-    var eventName = gameInfo.querySelector("a[data-bind*='data().roomData.name']").textContent;
-    var round = gameInfo.querySelector("span[data-bind*='data().round']").textContent;
+    let eventName = gameInfo.querySelector("a[data-bind*='data().roomData.name']").textContent;
+    let round = gameInfo.querySelector("span[data-bind*='data().round']").textContent.replace( /^\D+/g, '');
 
-    var pgn = `
-${pgnTag("Event", eventName)}
-${pgnTag("Round", round)}
-${pgnTag("White", whitePlayer)}
-${pgnTag("Black", blackPlayer)}
-${pgnTag("Result", result)}
-
-${moveListString(moves)}
-`;
-
-    return pgn;
+    return {
+        "event": eventName,
+        "round": round,
+        "white": whitePlayer,
+        "black": blackPlayer,
+        "result": result,
+        "moveText": moveListString(moves)
+    };
 }
 
 function pgnTag(key, value){
@@ -61,8 +71,8 @@ function pgnTag(key, value){
 }
 
 function moveListString(moves){
-    var result = "";
-    for(var i = 1; i < moves.length; i += 2){
+    let result = "";
+    for(let i = 1; i < moves.length; i += 2){
         if(i > 1){
             result += " ";
         }
